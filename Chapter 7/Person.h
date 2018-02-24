@@ -21,12 +21,12 @@ private:
 std::istream &read(std::istream &, Person &);
 std::ostream &print(std::ostream &, Person &);
 
-std::istream &read(std::istream &in, Person &p) {
+std::istream &read(std::istream &in = std::cin, Person &p) {
 	in >> p.name >> p.adress;
 	return in;
 }
 
-std::ostream &print(std::ostream &out, Person &p) {
+std::ostream &print(std::ostream &out = std::cout, Person &p) {
 	out <<  "Hi my name is " << p.get_name() << std::endl <<
 			"I live on " << p.get_adress() << std::endl;
 }

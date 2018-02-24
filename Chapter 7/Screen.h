@@ -19,7 +19,7 @@ public:
 	Screen &display(std::ostream &out) { do_display(out); return *this; }
 	const Screen &display(std::ostream &out) const { do_display(out); return *this; }
 private:
-	void do_display (std::ostream &out) const;
+	void do_display (std::ostream &) const;
 	pos cursor = 0;
 	pos height = 0, width = 0;
 	std::string contents;
@@ -61,7 +61,7 @@ Screen &Screen::set(pos r, pos c, char ch)
 	return *this;
 }
 
-void Screen::do_display (std::ostream &out) const
+void Screen::do_display (std::ostream &out = std::cout) const
 {
 	for (pos i = 0; i < height * width; ++i)
 	{
