@@ -37,14 +37,14 @@ Sales_data& Sales_data::combine(const Sales_data &rhs) {
 	return *this;
 }
 
-std::istream &read (std::istream &in = std::cin, Sales_data &item) {
+std::istream &read (std::istream &in, Sales_data &item) {
 	double price = 0;
 	in >> item.bookNo >> item.units_sold >> price;
 	item.revenue = item.units_sold * price;
 	return in;
 }
 
-std::ostream &print (std::ostream &out = std::cout, const Sales_data &item) {
+std::ostream &print (std::ostream &out, const Sales_data &item) {
 	out <<  "----------------------------------" << std::endl <<
 			"Book:\t\t\t\t" << item.isbn() << std::endl <<
 			"Units sold:\t\t\t" << item.units_sold << std::endl <<
