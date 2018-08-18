@@ -17,11 +17,15 @@ TextQuery::TextQuery(std::ifstream& in) {
 
 void TextQuery::print (std::ostream& out, std::string s) {
     lower(s);
-    auto line_set = line_map[s];
-    std::cout << s << " was found in " << line_set.size() << " lines" << std::endl;
+    auto &line_set = line_map[s];
+    std::cout << s << " was found in " << line_set.size() << make_plural(line_set.size(), " line", "s") << std::endl;
     for (int i : line_set) {
-        std::cout << "(line " << i << ") " << line_vector[i-1] << std::endl;
+        std::cout << "\t(line " << i << ") " << line_vector[i-1] << std::endl;
     }
+}
+
+std::string make_plural(size_t ctr, const std::string &word, const std::string &ending) {
+    return ctr > 1 ? word + ending : word;
 }
 
 void lower(std::string &s) {
