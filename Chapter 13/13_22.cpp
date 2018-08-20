@@ -6,9 +6,12 @@ public:
             ps(new std::string(s)), i(0) { }
     HasPtr (const HasPtr &hp) :
             ps(new std::string(*hp.ps)), i(hp.i) { }
-    HasPtr& operator= (const HasPtr &rhs) { // this method is written poorly, mistakes are explained in the book right after this exercise
-        ps = new std::string(*rhs.ps);
+    HasPtr& operator= (const HasPtr &rhs) {
+        auto temp = new std::string(*rhs.ps);
+        delete ps;
+        ps = temp;
         i = rhs.i;
+        return *this;
     }
     ~HasPtr() {
         delete ps;
