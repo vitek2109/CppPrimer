@@ -44,7 +44,7 @@ std::pair<std::string*, std::string*> StrVec::alloc_n_copy(const std::string *b,
 void StrVec::free()
 {
     if (elements) {                                             // if there are any elements
-        for (auto p = first_free; p = elements; /* empty */)    // for every of them
+        for (auto p = first_free; p != elements; /* empty */)    // for every of them
             alloc.destroy(--p);                                 // destroy them
         alloc.deallocate(elements, cap-elements);               // deallocate all allocated space
     }
@@ -64,7 +64,7 @@ void StrVec::reallocate()
     auto dest = newdata;                // beginning of new value range
     auto elem = elements;               // corresponding element from old value range
     for (size_t i = 0; i < size(); ++i) // move all elements
-        alloc.construct(newdata++, std::move(*elem++));
+        alloc.construct(dest++, std::move(*elem++));
     // free old space
     free();
     // update the pointers
