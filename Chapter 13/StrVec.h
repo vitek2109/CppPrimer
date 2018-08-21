@@ -1,5 +1,6 @@
 #ifndef STRVEC
 #define STRVEC
+#include <iostream>
 #include <vector>
 #include <memory>
 #include <utility>
@@ -16,6 +17,7 @@ public:
     ~StrVec();                          // destructor
     // few basic functions
     void push_back(const std::string&); // adds element to the end
+    std::string at(size_t i) { return *(elements+i); }   // returns element at index i
     size_t size() const { return first_free - elements; } // returns number of initialized elements
     size_t capacity() const { return cap - elements; }    // returns number of allocated elements
     std::string* begin() const { return elements; } // returns pointer to the first element
