@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <utility>
 
 class StrBlobPtr;
 class ConstStrBlobPtr;
@@ -19,7 +20,8 @@ public:
     size_type size() const { return data->size(); }
     bool empty() const { return data->empty(); }
     // addition and removal of elements
-    void push_back(const std::string &t) { data->push_back(t); }
+    void push_back(const std::string &t) const & { data->push_back(t); }
+    void push_back(const std::string &t) && { data->push_back(std::move(t)); }
     void pop_back();
     // element access
     std::string& front();
