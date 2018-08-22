@@ -11,12 +11,14 @@ String::String(const char *c)
 }
 String::String(const String &s)
 {
+    std::cout << "Copy Constructor" << std::endl;
     auto data = alloc_n_copy(s.begin(), s.end());
     elements = data.first;
     cap = first_free = data.second;
 }
 String& String::operator=(const String &rhs)
 {
+    std::cout << "Copy-Assignment Operator" << std::endl;
     auto data = alloc_n_copy(rhs.begin(), rhs.end());
     free();
     elements = data.first;
