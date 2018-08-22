@@ -13,7 +13,9 @@ public:
     StrVec(const std::initializer_list<std::string>&);
     // copy control
     StrVec(const StrVec&);              // copy constructor
-    StrVec& operator= (const StrVec&);  // copy-assignment operator
+    StrVec(StrVec&&) noexcept;
+    StrVec& operator=(const StrVec&);  // copy-assignment operator
+    StrVec& operator=(StrVec&&) noexcept;
     ~StrVec();                          // destructor
     // few basic functions
     void push_back(const std::string&); // adds element to the end

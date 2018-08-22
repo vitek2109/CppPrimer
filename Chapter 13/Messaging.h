@@ -2,6 +2,7 @@
 #define MESSAGING
 #include <string>
 #include <set>
+#include <utility>
 
 class Folder;
 
@@ -13,7 +14,9 @@ public:
     explicit Message(const std::string &s = "") : contents(s) {}
     // copy control
     Message(const Message&);                // copy constructor
-    Message& operator= (const Message&);    // copy-assignment operator
+    Message(Message&&);                     // move constructor
+    Message& operator=(const Message&);     // copy-assignment operator
+    Message& operator=(Message&&);          // move-assignment operator
     ~Message();                             // destructor
     // add/delete this message to/from a set of messages of the folder
     void save(Folder&);
@@ -26,6 +29,8 @@ private:
     void add_to_Folders(const Message&);
     // remove this message from all folders
     void remove_from_Folders();
+    // move folders from paramenet to this message
+    void move_Folders(Message*);
 };
 // swap two messages
 void swap (Message&, Message&);

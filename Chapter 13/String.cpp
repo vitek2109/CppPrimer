@@ -16,6 +16,12 @@ String::String(const String &s)
     elements = data.first;
     cap = first_free = data.second;
 }
+String::String(String &&s) noexcept
+    : elements(s.elements), first_free(s.first_free), cap(s.cap)
+{
+    std::cout << "Move Constuctor" << std::endl;
+    s.elements = s.first_free = s.cap = nullptr;
+}
 String& String::operator=(const String &rhs)
 {
     std::cout << "Copy-Assignment Operator" << std::endl;
@@ -23,6 +29,18 @@ String& String::operator=(const String &rhs)
     free();
     elements = data.first;
     cap = first_free = data.second;
+}
+String& String::operator=(String &&rhs) noexcept
+{
+    std::cout << "Move-Assignment Operator" << std::endl;
+    if (this != &rhs) {
+        free();
+        elements = rhs.elements;
+        first_free = rhs.first_free;
+        cap = rhs.cap;
+        rhs.elements = rhs.first_free = rhs.cap = nullptr;
+    }
+    return *this;
 }
 String::~String()
 {

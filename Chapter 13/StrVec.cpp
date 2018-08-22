@@ -16,12 +16,28 @@ StrVec::StrVec(const StrVec &sv)
     elements = data.first;                          // reassign all the pointers to the new area of values
     first_free = cap = data.second;
 }
+StrVec::StrVec(StrVec &&sv) noexcept
+    : elements(sv.elements), first_free(sv.first_free), cap(sv.cap);
+{
+    sv.elements = sv.first_free = sv.cap  = nullptr;
+}
 StrVec& StrVec::operator= (const StrVec &rhs)
 {
     auto data = alloc_n_copy(rhs.begin(), rhs.end());   // returns a pair of pointers defining the area of values
     free();                                             // delete everything
     elements = data.first;                              // reassign all the pointers to the new area of values
     first_free = cap = data.second;
+    return *this;
+}
+StrVec& StrVec::operator=(StrVec &&rhs)
+{
+    if (this != &rhs) {
+        free();
+        elements = rhs.elements;
+        first_free = rhs.first_free;
+        cap = rhs.cap;
+        rhs.elements = rhs.first_free = rhs.cap = nullptr;
+    }
     return *this;
 }
 StrVec::~StrVec()
@@ -59,16 +75,15 @@ void StrVec::reallocate()
     // make room for twice as many elements
     auto newcapacity = size() ? size() * 2 : 1;
     // allocate new space
-    auto newdata = alloc.allocate(newcapacity);
+    auto first = alloc.allocate(newcapacity);
     // move everything
-    auto dest = newdata;                // beginning of new value range
-    auto elem = elements;               // corresponding element from old value range
-    for (size_t i = 0; i < size(); ++i) // move all elements
-        alloc.construct(dest++, std::move(*elem++));
+    auto last = std::uninitialized_copy(std::make_move_iterator(begin()),
+                                        std::make_move_iterator(end()),
+                                        first);
     // free old space
     free();
     // update the pointers
     elements = newdata;
-    first_free = dest;
+    first_free = last;
     cap = elements + newcapacity;
 }
