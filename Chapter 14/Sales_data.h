@@ -12,7 +12,11 @@ public:
 	Sales_data(const std::string &s): bookNo(s) {}
 	Sales_data(const std::string &s, const unsigned &n, const double &p): bookNo(s), units_sold(n), revenue(n*p) {}
 	Sales_data(std::istream &);
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> 1542e39313275918cf4a93b8b17bb4857ec31b3b
 	std::string isbn() const { return bookNo; }
 	Sales_data &combine(const Sales_data &rhs);
 private:
@@ -22,6 +26,7 @@ private:
 	double revenue = 0.0;
 };
 
+<<<<<<< HEAD
 
 std::istream &read (std::istream &, Sales_data &);
 std::istream &operator>> (std::istream &, Sales_data &);
@@ -30,6 +35,11 @@ std::ostream &operator<< (std::ostream &, const Sales_data &);
 Sales_data add(const Sales_data &, const Sales_data &);
 Sales_data operator+(const Sales_data &, const Sales_data &);
 Sales_data &operator+=(const Sales_data &);
+=======
+std::istream &read (std::istream &, Sales_data &);
+std::ostream &print (std::ostream &, const Sales_data &);
+Sales_data add(const Sales_data &, const Sales_data &);
+>>>>>>> 1542e39313275918cf4a93b8b17bb4857ec31b3b
 
 Sales_data::Sales_data(std::istream &in)
 {
@@ -63,4 +73,8 @@ Sales_data add(const Sales_data &lhs, const Sales_data &rhs) {
 	sum.combine(rhs);
 	return sum;
 }
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> 1542e39313275918cf4a93b8b17bb4857ec31b3b
