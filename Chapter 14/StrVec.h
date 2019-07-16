@@ -1,53 +1,116 @@
 #ifndef STRVEC
 #define STRVEC
-#include <iostream>
-#include <vector>
-#include <string>
+
 #include <memory>
-#include <utility>
-#include <algorithm>
+#include <string>
+#include <initializer_list>
 
 class StrVec {
-    friend bool operator== (const String&, const String&);
 public:
-    // constructors
-    StrVec() : elements(nullptr), first_free(nullptr), cap(nullptr) { }
+	StrVec() : 	// allocator has a default constructor
+		elements(nullptr), first_free(nullptr), cap(nullptr) {}
     StrVec(const std::initializer_list<std::string>&);
-    // copy control
-    StrVec(const StrVec&);              // copy constructor
-    StrVec(StrVec&&) noexcept;
-    StrVec& operator=(const StrVec&);  // copy-assignment operator
-    StrVec& operator=(StrVec&&) noexcept;
-    ~StrVec();                          // destructor
-    // few basic functions
-    void push_back(const std::string&); // adds element to the end
-    std::string at(size_t i) { return *(elements+i); }   // returns element at index i
-    size_t size() const { return first_free - elements; } // returns number of initialized elements
-    size_t capacity() const { return cap - elements; }    // returns number of allocated elements
-    std::string* begin() const { return elements; } // returns pointer to the first element
-    std::string* end() const { return first_free; } // returns pointer to the element after the last initialized
-    void reserve(size_t n) { while(capacity() < n) reallocate(); }    // make sure there is at least n allocated elements
-    void resize(size_t n, std::string s = "") { while(size() < n) push_back(s); }   // make sure there is at least n initialized elements, initialize new ones with s if needed
+	StrVec(const StrVec&);			// copy constructor
+	StrVec &operator=(const StrVec&);	// copy assingment operator
+	~StrVec();				// destructor
+	void push_back(const std::string&);	// add element to the end
+	size_t size() const { return first_free - elements; }
+	size_t capacity() const { return cap - elements; }
+    void reserve(const size_t&);
+    void resize(const size_t&, const std::string&);
+	std::string *begin() const { return elements; }
+	std::string *end() const { return first_free; }
 private:
-    // memory control
-    std::allocator<std::string> alloc;
-    // pointers to
-    std::string* elements;      // the very first element
-    std::string* first_free;    // first non-initialized element
-    std::string* cap;           // first non-existing element
-    // utility methods
-    // copy elements and return a pair of pointers to the new area
-    std::pair<std::string*, std::string*>
-        alloc_n_copy (const std::string*, const std::string*);
-    // delete everything
-    void free();
-    // make sure there is enough space
-    void chk_n_alloc();
-    // make more space by moving everything
-    void reallocate();
+	std::allocator<std::string> alloc;	// reserves memory
+	// used by functions that add elements
+	void chk_n_alloc() { if (size() == capacity()) reallocate(); }
+	// used to copy instances
+	std::pair<std::string*, std::string*> alloc_n_copy(const std::string*, const std::string*);
+	void free(); // deletes elements and deallocates memory
+	void reallocate(); // gets more memory and moves everything
+	std::string *elements;		// first element
+	std::string *first_free;	// first free element
+	std::string *cap;		// the end of allocated memory
 };
 
-bool operator== (const String&, const String&);
-bool operator!= (const String&, const String&);
+StrVec::StrVec(const StrVec &s) {
+    std::pair<std::string*, std::string*> new_data = alloc_n_copy(s.begin(), s.end());
+    elements = new_data.first;
+    first_free = cap = new_data.second;
+}
+
+StrVec::StrVec(const std::initializer_list<std::string> &lst) {
+    for (const auto &e : lst)
+        push_back(e);
+}
+
+StrVec& StrVec::operator=(const StrVec &rhs) {
+    auto data = alloc_n_copy(rhs.begin(), rhs.end());
+    free();
+    elements = data.first;
+    first_free = cap = data.second;
+    return *this;
+}
+
+StrVec::~StrVec() {
+    free();
+}
+
+void StrVec::push_back(const std::string& s) {
+	chk_n_alloc(); // now we have enough memory
+	alloc.construct(first_free++, s); // make a copy of s in the first free spot
+}
+
+void StrVec::reserve(const size_t &n) {
+    if (n > capacity()) {
+        auto newcapacity = n;
+        auto newdata = alloc.allocate(newcapacity);
+        auto dest = newdata;
+        auto elem = elements;
+        for (size_t i = 0; i != size(); ++i)
+            alloc.construct(dest++, std::move(*elem++));
+        free();
+        elements = newdata;
+        first_free = dest;
+        cap = elements + newcapacity;
+    }
+}
+
+void StrVec::resize(const size_t& n, const std::string& s = "") {
+    while (n > size()) {
+        push_back(s);
+    }
+    if (n < size()) {
+        for (size_t i = size(); i > n; --i) {
+            alloc.destroy(--first_free);
+        }
+    }
+}
+
+std::pair<std::string*, std::string*> StrVec::alloc_n_copy(const std::string *b, const std::string *e) {
+    auto data = alloc.allocate(e - b);                  // allocate new memory
+    return { data, uninitialized_copy(b, e, data) };    // return pair contoining pointers to the first and last elements of it
+}
+
+void StrVec::free() {
+    if (elements) {         // if not empty
+        for (auto p = first_free; p != elements; /*   */)   // delete everything
+            alloc.destroy(--p);
+        alloc.deallocate(elements, cap - elements);     // deallocate memory
+    }
+}
+
+void StrVec::reallocate() {
+    auto newcapacity = size() ? 2*size() : 1;       // new capaticy is twice the old one
+    auto newdata = alloc.allocate(newcapacity);
+    auto dest = newdata;
+    auto elem = elements;
+    for (size_t i = 0; i != size(); ++i)
+        alloc.construct(dest++, std::move(*elem++));
+    free();
+    elements = newdata;
+    first_free = dest;
+    cap = elements + newcapacity;
+}
 
 #endif
