@@ -5,19 +5,21 @@
 #include <string>
 #include <initializer_list>
 
+#include <iostream>
+
 class StrVec {
 public:
 	StrVec() : 	// allocator has a default constructor
 		elements(nullptr), first_free(nullptr), cap(nullptr) {}
-    StrVec(const std::initializer_list<std::string>&);
+	StrVec(const std::initializer_list<std::string>&);
 	StrVec(const StrVec&);			// copy constructor
 	StrVec &operator=(const StrVec&);	// copy assingment operator
 	~StrVec();				// destructor
 	void push_back(const std::string&);	// add element to the end
 	size_t size() const { return first_free - elements; }
 	size_t capacity() const { return cap - elements; }
-    void reserve(const size_t&);
-    void resize(const size_t&, const std::string&);
+	void reserve(const size_t&);
+	void resize(const size_t&, const std::string&);
 	std::string *begin() const { return elements; }
 	std::string *end() const { return first_free; }
 private:
@@ -40,8 +42,9 @@ StrVec::StrVec(const StrVec &s) {
 }
 
 StrVec::StrVec(const std::initializer_list<std::string> &lst) {
-    for (const auto &e : lst)
-        push_back(e);
+	auto data = alloc_n_copy(lst.begin(), lst.end());
+	elements = data.first;
+	first_free = cap = data.second;
 }
 
 StrVec& StrVec::operator=(const StrVec &rhs) {
@@ -89,7 +92,7 @@ void StrVec::resize(const size_t& n, const std::string& s = "") {
 
 std::pair<std::string*, std::string*> StrVec::alloc_n_copy(const std::string *b, const std::string *e) {
     auto data = alloc.allocate(e - b);                  // allocate new memory
-    return { data, uninitialized_copy(b, e, data) };    // return pair contoining pointers to the first and last elements of it
+    return { data, uninitialized_copy(b, e, data) };    // return pair containing pointers to the first and last elements of it
 }
 
 void StrVec::free() {
